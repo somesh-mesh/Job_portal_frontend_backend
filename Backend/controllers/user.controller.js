@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 export const register = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, password, role } = req.body;
-        
+
         // Check if any required fields are missing
         if (!fullname || !email || !phoneNumber || !password || !role) {
             return res.status(400).json({
@@ -36,8 +36,8 @@ export const register = async (req, res) => {
             role,
         });
 
-        
-    return res.status(201).json({
+
+        return res.status(201).json({
             message: "User registered successfully.",
             success: true,
             user: newUser,  // Optionally, you can return the created user details (excluding the password)
@@ -131,13 +131,71 @@ export const login = async (req, res) => {
     }
 };
 
-export const logout = async (req,res) =>{
-    try{
-        return res.status(200).cookie("token", "", {maxAge:0}).json({
-            message : "Logged Out Successfully.",
-            success:true
-        })
-    }catch(error){
-        console.log(error);
+export const logout = async (req, res) => {
+    try {
+        return res.status(200).cookie("token", "", {
+            maxAge: 0,
+            path: '/' // Add other attributes like httpOnly, secure if they were set when the cookie was created.
+        }).json({
+            message: "Logged Out Successfully.",
+            success: true
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Failed to log out.",
+            success: false
+        });
     }
-}
+};
+
+
+export const updateProfile = async (req, res) => {
+    try {
+        const { fullname, email, phoneNumber, bio, skills } = req.body;
+        const file = req.file; // Ensure you handle or use this 'file' if it's important for the profile update.
+        if (!fullname || !email || !phoneNumber || !bio || !skills) {
+            return res.status(400).json({
+                message: "All fields must be provided.",
+                success: false
+            });
+        }
+
+        // Assuming 'skills' is a string of comma-separated values
+        const skillsArray = skills.split(",");
+
+        // Assuming 'req.user.id' holds the authenticated user's ID, adjust based on your setup
+        const userId = req.user.id;
+
+        // Use 'findByIdAndUpdate' for more efficient operation
+        const user = await User.findByIdAndUpdate(userId, {
+            $set: {
+                fullname: fullname,
+                email: email,
+                phoneNumber: phoneNumber,
+                "profile.bio": bio,
+                "profile.skills": skillsArray
+            }
+        }, { new: true });
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found.",
+                success: false
+            });
+        }
+
+        return res.status(200).json({
+            message: "Profile updated successfully.",
+            success: true,
+            user: user
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Error updating profile.",
+            success: false
+        });
+    }
+};
+
