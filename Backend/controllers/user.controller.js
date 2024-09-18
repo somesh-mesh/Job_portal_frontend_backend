@@ -1,59 +1,57 @@
-import { User } from "../models/user.model";
+import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-
+// User Registration
 export const register = async (req, res) => {
     try {
-        const { fullname, email, phoneNumber, password, role } = req.body;
+        const { fullName, email, phoneNumber, password, role } = req.body;
 
-        // Check if any required fields are missing
-        if (!fullname || !email || !phoneNumber || !password || !role) {
+        // Check if required fields are provided
+        if (!fullName || !email || !phoneNumber || !password || !role) {
             return res.status(400).json({
-                message: "Something is missing",
+                message: "Please provide all required fields.",
                 success: false
             });
         }
 
-        // Check if a user with the given email already exists
-        const user = await User.findOne({ email });
-        if (user) {
+        // Check if user already exists with the same email
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
             return res.status(400).json({
-                message: "User already exists with this email.",
+                message: "A user with this email already exists.",
                 success: false
             });
         }
 
-        // Hash the password before saving
+        // Hash the user's password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create a new user
+        // Create a new user and save to the database
         const newUser = await User.create({
-            fullname,
+            fullName,  // Changed to match schema
             email,
-            phoneNumber,
+            phoneNumber: phoneNumber.toString(),  // Ensure phoneNumber is stored as a string
             password: hashedPassword,
             role,
         });
 
-
         return res.status(201).json({
             message: "User registered successfully.",
             success: true,
-            user: newUser,  // Optionally, you can return the created user details (excluding the password)
+            user: { fullName, email, phoneNumber, role } // Avoid returning password
         });
 
     } catch (error) {
-        // Log the error and return an error response
-        console.error(error);
-        return res.status(500).json({
+        console.error(`fromConsoleLog ${error}`);
+       return res.status(500).json({
             message: "An error occurred during registration.",
             success: false
         });
     }
 };
 
-
+// User Login
 export const login = async (req, res) => {
     try {
         const { email, password, role } = req.body;
@@ -66,20 +64,20 @@ export const login = async (req, res) => {
             });
         }
 
-        // Check if the user exists in the database
-        let user = await User.findOne({ email });
+        // Find user by email
+        const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({
-                message: "Incorrect email or password.",
+                message: "Invalid email or password.",
                 success: false,
             });
         }
 
-        // Verify the password
+        // Check if password matches
         const isPasswordMatched = await bcrypt.compare(password, user.password);
         if (!isPasswordMatched) {
             return res.status(400).json({
-                message: "Incorrect email or password.",
+                message: "Invalid email or password.",
                 success: false,
             });
         }
@@ -87,73 +85,70 @@ export const login = async (req, res) => {
         // Check if the role matches
         if (role !== user.role) {
             return res.status(400).json({
-                message: "Account doesn't exist with the provided role.",
+                message: "The account does not match the specified role.",
                 success: false,
             });
         }
 
-        // Create the token payload
-        const tokenData = {
-            userId: user._id,
-        };
+        // Generate a JWT token
+        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
 
-        // Generate the JWT token (Corrected the expiry time to '1d')
-        const token = jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
-
-        // Send user data (without password) in response
+        // Return the token in a cookie and user data (excluding sensitive info)
         const userData = {
             _id: user._id,
-            fullName: user.fullname,
+            fullname: user.fullname,
             email: user.email,
             role: user.role,
-            profile: user.profile,
         };
 
-        // Set the cookie and return the response
         return res.status(200)
             .cookie('token', token, {
-                maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+                maxAge: 24 * 60 * 60 * 1000, // 1 day
                 httpOnly: true,
                 sameSite: 'strict',
             })
             .json({
-                message: `Welcome back, ${user.fullName}`, // Use correct template literal syntax
+                message: `Welcome back, ${user.fullname}!`,
                 success: true,
-                user: userData, // Optionally send user data
+                user: userData
             });
+
     } catch (error) {
-        // Catch any error and return a server error response
-        console.error(error); // Log the error for debugging purposes
+        console.error(error);
         return res.status(500).json({
-            message: "An error occurred while processing your request.",
+            message: "An error occurred while logging in.",
             success: false,
         });
     }
 };
 
+// User Logout
 export const logout = async (req, res) => {
     try {
-        return res.status(200).cookie("token", "", {
-            maxAge: 0,
-            path: '/' // Add other attributes like httpOnly, secure if they were set when the cookie was created.
-        }).json({
-            message: "Logged Out Successfully.",
-            success: true
-        });
+        return res.status(200)
+            .cookie("token", "", {
+                maxAge: 0,
+                path: '/', 
+            })
+            .json({
+                message: "Logged out successfully.",
+                success: true
+            });
     } catch (error) {
         console.error(error);
         return res.status(500).json({
-            message: "Failed to log out.",
+            message: "Error occurred during logout.",
             success: false
         });
     }
 };
 
-
+// Update User Profile
 export const updateProfile = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, bio, skills } = req.body;
-        const file = req.file; // Ensure you handle or use this 'file' if it's important for the profile update.
+        const userId = req.user.id; // Assumes req.user is populated by authentication middleware
+
         if (!fullname || !email || !phoneNumber || !bio || !skills) {
             return res.status(400).json({
                 message: "All fields must be provided.",
@@ -161,24 +156,25 @@ export const updateProfile = async (req, res) => {
             });
         }
 
-        // Assuming 'skills' is a string of comma-separated values
-        const skillsArray = skills.split(",");
+        // Process skills (assuming comma-separated string)
+        const skillsArray = skills.split(",").map(skill => skill.trim());
 
-        // Assuming 'req.user.id' holds the authenticated user's ID, adjust based on your setup
-        const userId = req.user.id;
+        // Find and update user
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            {
+                $set: {
+                    fullname,
+                    email,
+                    phoneNumber,
+                    "profile.bio": bio,
+                    "profile.skills": skillsArray,
+                },
+            },
+            { new: true } // Return the updated document
+        );
 
-        // Use 'findByIdAndUpdate' for more efficient operation
-        const user = await User.findByIdAndUpdate(userId, {
-            $set: {
-                fullname: fullname,
-                email: email,
-                phoneNumber: phoneNumber,
-                "profile.bio": bio,
-                "profile.skills": skillsArray
-            }
-        }, { new: true });
-
-        if (!user) {
+        if (!updatedUser) {
             return res.status(404).json({
                 message: "User not found.",
                 success: false
@@ -188,7 +184,7 @@ export const updateProfile = async (req, res) => {
         return res.status(200).json({
             message: "Profile updated successfully.",
             success: true,
-            user: user
+            user: updatedUser
         });
     } catch (error) {
         console.error(error);
@@ -198,4 +194,3 @@ export const updateProfile = async (req, res) => {
         });
     }
 };
-

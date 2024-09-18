@@ -1,47 +1,47 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
-const jobSchema  = new mongoose.Schema({
-    title : {
-        type : String,
-        required:true
+const jobSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        required: true,
     },
-    description : {
-        type : String,
-        required:true
+    description: {
+        type: String,
+        required: true,
     },
-    requirements : [{
-        type:String
+    requirements: [{
+        type: String,
     }],
-    salary : {
-        type : Number,
-        required:true
+    salary: {
+        type: Number,
+        required: true,
     },
-    location : {
-        type : String,
-        required:true
+    location: {
+        type: String,
+        required: true,
     },
-    jobType : {
-        type : String,
-        required:true
+    jobType: {
+        type: String,
+        required: true,
     },
-    position : {
-        type : Number,
-        required:true
+    position: {
+        type: Number,
+        required: true,
     },
-    company : {
-        type : mongoose.Types.ObjectId,
-        ref:'Company',
-        required:true
+    company: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Company',
+        required: true,
     },
-    created_by : {
-        type : mongoose.Types.ObjectId,
-        ref:'User',
-        required:true
+    created_by: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+        required: true,
     },
-    application : {
-        type : mongoose.Types.ObjectId,
-        ref:'Application',
-      
+    application: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Application',
     },
-},{timeseries : true});
-export const Job = mongoose.model('Job',jobSchema);
+}, { timestamps: true });  // Fixed from timeseries to timestamps
+
+export const Job = mongoose.model('Job', jobSchema);

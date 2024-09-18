@@ -1,32 +1,27 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const companySchema = new mongoose.Schema({
-    name :{
-        type:String,
-        required :true,
+    name: {
+        type: String,
+        required: true,
     },
-    description :{
-        type:String,
-        
+    description: {
+        type: String,
     },
-    website :{
-        type:String,
-        
+    website: {
+        type: String,
     },
-    location :{
-        type:String,
-        
+    location: {
+        type: String,
     },
-    logo :{
-        type:String,
-        
+    logo: {
+        type: String,
     },
-      userId  :{
-        type:mongoose.Types.ObjectId,
-        ref:'User',
-        required :true
-        
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
-},{timeseries : true});
+}, { timestamps: true });  // Fixed to use timestamps instead of timeseries
 
-export const Company = mongoose.model('Company',companySchema);
+export const Company = mongoose.model('Company', companySchema);
