@@ -12,8 +12,8 @@ const isAuthenticated = (req, res, next) => {
         // Verify the token
         const decoded = jwt.verify(token, process.env.SECRET_KEY); // Synchronously verify JWT
 
-        // Attach user ID to the request for further use
-        req.id = decoded.userId; // Assuming the token payload contains 'userId'
+        // Attach user ID to req.user instead of req.id
+        req.user = { id: decoded.userId }; // Assuming the token payload contains 'userId'
 
         // Proceed to the next middleware or route handler
         next();
