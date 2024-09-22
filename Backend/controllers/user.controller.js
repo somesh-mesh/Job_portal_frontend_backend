@@ -44,7 +44,7 @@ export const register = async (req, res) => {
 
     } catch (error) {
         console.error(`fromConsoleLog ${error}`);
-        return res.status(500).json({
+       return res.status(500).json({
             message: "An error occurred during registration.",
             success: false
         });
@@ -99,7 +99,7 @@ export const login = async (req, res) => {
             fullname: user.fullname,
             email: user.email,
             role: user.role,
-            profile: user.profile
+            profile : user.profile
         };
 
         return res.status(200)
@@ -123,7 +123,26 @@ export const login = async (req, res) => {
     }
 };
 
-
+// User Logout
+export const logout = async (req, res) => {
+    try {
+        return res.status(200)
+            .cookie("token", "", {
+                maxAge: 0,
+                path: '/', 
+            })
+            .json({
+                message: "Logged out successfully.",
+                success: true
+            });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Error occurred during logout.",
+            success: false
+        });
+    }
+};
 
 // Update User Profile
 export const updateProfile = async (req, res) => {
@@ -139,8 +158,8 @@ export const updateProfile = async (req, res) => {
         // }
 
         // Process skills (assuming comma-separated string)
-        let skillsArray;
-        if (skillsArray) {
+       let skillsArray;
+        if(skillsArray){
             skillsArray = skills.split(",").map(skill => skill.trim());
         }
 
@@ -179,29 +198,3 @@ export const updateProfile = async (req, res) => {
         });
     }
 };
-
-
-// In your user.controller.js
-
-export const logout = (req, res) => {
-    try {
-        // Clear the 'token' cookie
-        res.clearCookie('token', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'Strict',
-        });
-
-        return res.status(200).json({
-            message: "Logged out successfully.",
-            success: true
-        });
-    } catch (error) {
-        console.error("Logout error: ", error);
-        return res.status(500).json({
-            message: "Error during logout.",
-            success: false
-        });
-    }
-};
-
