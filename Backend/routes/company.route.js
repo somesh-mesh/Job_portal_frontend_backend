@@ -10,6 +10,6 @@ const router = express.Router();
 router.post("/register", isAuthenticated, registerCompany); // Register a company
 router.get("/get", isAuthenticated, getCompany); // Get company information for the authenticated user
 router.get("/get/:id", isAuthenticated, getCompanyById); // Get company by ID
-// router.put("/update/:id", isAuthenticated, singleUpload.single('file'), updateCompany); // Update company information
+router.put("/update/:id", isAuthenticated, updateCompany); // Update company information
 
 export default router;
