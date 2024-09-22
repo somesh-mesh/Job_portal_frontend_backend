@@ -1,7 +1,8 @@
 import { Company } from "../models/company.model.js";
-// import getDataUri from "../utils/datauri.js";
-// import cloudinary from "../utils/cloudinary.js";
 
+
+
+//http://localhost:8000/api/v1/company/register
 export const registerCompany = async (req, res) => {
     try {
         const { companyName } = req.body;
@@ -34,6 +35,7 @@ export const registerCompany = async (req, res) => {
 }
 
 
+//http://localhost:8000/api/v1/company/get
 export const getCompany = async (req, res) => {
     try {
         const userId = req.user.id; // logged in user id
@@ -53,6 +55,8 @@ export const getCompany = async (req, res) => {
     }
 }
 // get company by id
+//this working fine.
+// http://localhost:8000/api/v1/company/get/mongoId
 export const getCompanyById = async (req, res) => {
     try {
         const companyId = req.params.id;
