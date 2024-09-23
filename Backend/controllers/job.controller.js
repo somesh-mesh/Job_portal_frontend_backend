@@ -1,17 +1,42 @@
 import { Job } from "../models/job.model.js";
 
-// Post a Job
 export const postJob = async (req, res) => {
     try {
-        const { title, description, requirement, salary, location, jobType, experience, position, companyId } = req.body; // Fixed typo in 'position'
-        const userId = req.user.id; // Corrected from usedId to userId
+        const {
+            title,
+            description,
+            requirement,
+            salary,
+            location,
+            jobType,
+            experience,
+            position,
+            companyId
+        } = req.body;
+
+        const userId = req.user.id;
+
+        // List of required fields
+        const requiredFields = {
+            title,
+            description,
+            requirement,
+            salary,
+            location,
+            jobType,
+            experience,
+            position,
+            companyId
+        };
 
         // Check for missing fields
-        if (!title || !description || !requirement || !salary || !location || !jobType || !experience || !position || !companyId) {
-            return res.status(400).json({
-                message: "Something is missing.",
-                success: false
-            });
+        for (const [key, value] of Object.entries(requiredFields)) {
+            if (!value) {
+                return res.status(400).json({
+                    message: `${key} is missing.`,
+                    success: false
+                });
+            }
         }
 
         // Create new Job
@@ -23,9 +48,9 @@ export const postJob = async (req, res) => {
             location,
             jobType,
             experience,
-            position, // Fixed typo 'postion' to 'position'
+            position,
             company: companyId,
-            created_by: userId, // Use userId for created_by field
+            created_by: userId,
         });
 
         return res.status(201).json({
@@ -43,6 +68,7 @@ export const postJob = async (req, res) => {
     }
 };
 
+
 // Get All Jobs with Keyword Search
 export const getAllJobs = async (req, res) => {
     try {
@@ -54,7 +80,9 @@ export const getAllJobs = async (req, res) => {
             ]
         };
 
-        const jobs = await Job.find(query); // Changed 'job' to 'jobs' (plural)
+        const jobs = await Job.find(query).populate({
+            path:"company"
+        }).sort({createdAt:-1}); // Changed 'job' to 'jobs' (plural)
         if (!jobs || jobs.length === 0) { // Ensure array length is checked
             return res.status(404).json({
                 message: "Jobs not found.",
