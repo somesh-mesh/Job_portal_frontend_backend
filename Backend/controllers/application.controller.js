@@ -1,4 +1,5 @@
 import { Application } from "../models/application.model.js";
+import { Job } from "../models/job.model.js";
 
 export const applyJob = async (req, res) => {
     try {
@@ -83,13 +84,17 @@ export const getAppliedJobs = async (req, res) => {
 export const getApplicants = async (req, res) => {
     try {
         const jobId = req.params.id;
-        const job = await Job.findById(jobId).populate({
-            path: "application",
-            options: { sort: { createdAt: -1 } },
-            populate: {
-                path: "applicant",
-            },
-        });
+
+        // Find the job by its ID and populate the "application" field with related "applicant" data
+        const job = await Job.findById(jobId)
+            .populate({
+                path: 'application',        // Populating the 'application' field from the Job model
+                populate: {
+                    path: 'applicant',      // Populating the 'applicant' field from the Application model
+                    select: 'name email',   // Selecting specific fields from the applicant (e.g., name, email)
+                },
+                options: { sort: { createdAt: -1 } },  // Sorting applications by creation date
+            });
 
         if (!job) {
             return res.status(404).json({
@@ -98,12 +103,21 @@ export const getApplicants = async (req, res) => {
             });
         }
 
+        // If no applications were found
+        if (!job.application || job.application.length === 0) {
+            return res.status(404).json({
+                message: "No applicants found for this job.",
+                success: false,
+            });
+        }
+
+        // Returning the populated job applications (applicants)
         return res.status(200).json({
             job,
             success: true,
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.status(500).json({
             message: "Server error",
             success: false,
