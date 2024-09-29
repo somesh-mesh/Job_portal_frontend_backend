@@ -1,29 +1,35 @@
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { createBrowserRouter, RouterProvider } from "react-router-dom"; // Correct import statement
+
 import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
-import Navbar from "./components/shared/Navbar";
+import Home from "./components/home"; // Use uppercase `Home` for component names
 
-const appRoute = createBrowserRouter([
+// Define the router
+const appRouter = createBrowserRouter([
   {
     path: "/",
-    element: <Home />, // Changed `Element` to `element`
+    element: <Home />,
   },
   {
     path: "/login",
-    element: <Login />, // Make sure this references the correct component
+    element: <Login />,
   },
   {
     path: "/signup",
-    element: <Signup />, // Make sure this references the correct component
+    element: <Signup />,
   },
 ]);
 
 function App() {
   return (
     <>
-      <Router></Router>
-    
+      <RouterProvider router={appRouter} />
     </>
   );
 }
 
 export default App;
+
+

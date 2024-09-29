@@ -5,7 +5,8 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@radix-ui/react-popover";
-import { LogOut, User2 } from "lucide-react";
+import {LogOut, User2 } from "lucide-react";
+import { Link, useNavigate } from 'react-router-dom'
 import React, { useState } from "react";
 
 const Navbar = () => {
@@ -33,11 +34,17 @@ const Navbar = () => {
             onMouseLeave={() => setIsPopoverOpen(false)}
           >
             {!user ? (
-              <div className="flex items-center gap-2">
-                <Button variant="outline">Login</Button>
-                <Button className="bg-[#6A38C2] hover:bg-[#6A38C6] text-white">Signup</Button>
-
-              </div>
+            <div className="flex items-center gap-2">
+            <Link to="/login">
+              <Button variant="outline">Login</Button>
+            </Link>
+            <Link to="/signup">
+              <Button className="bg-[#6A38C2] hover:bg-[#6A38C6] text-white" variant="solid">
+                Signup
+              </Button>
+            </Link>
+          </div>
+          
             ) : (
               <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
                 <PopoverTrigger asChild>
