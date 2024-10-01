@@ -1,62 +1,123 @@
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "../shared/Navbar";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "../ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup } from "@/components/ui/radio-group";
 import { Button } from "../ui/button";
-import  { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import axios from "axios";
+import { USER_API_END_POINT } from "@/utils/constant";
 
 const Login = () => {
-    return (
-        <div>
-          <Navbar />
-          <div className="flex items-center justify-center max-w-7xl mx-auto">
-            <form action="" className="w-1/2 border-gray-200 rounded-md p-4 my-10">
-              <h1 className="font-bold text-cl mb-2">Login</h1>
-              <div className="my-2">
-                <Label>Email</Label>
-                <Input type="text" placeholder="abc@gmail.com" />
-              </div>
-              
-              <div className="my-2">
-                <Label>Password</Label>
-                <Input type="password" placeholder="Password" />
-              </div>
-              <div className="flex items-center justify-between">
-                <RadioGroup
-                  defaultValue="Student"
-                  className="flex items-center space-x-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name="role"
-                      value="student"
-                      className="cursor-pointer"
-                    ></input>
-                    <Label htmlFor="Student">Student</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name="role"
-                      value="Recruiter"
-                      className="cursor-pointer"
-                    ></input>
-                    <Label htmlFor="option-two">Recruiter</Label>
-                  </div>
-                </RadioGroup>
-               </div>
-              <Button type="submit" className="w-full my-4">
-                 Signup
-                 
-              </Button>
-              <span>Dont't have an account? <Link to="/signup" className="text-blue-600">Signup</Link></span>
-    
-            </form>
-          </div>
-        </div>
-      );
-}
+  const [input, setInput] = useState({
+    email: "",
+    password: "",
+    role: "",
+    file: "",
+  });
 
-export default Login
+  const navigate = useNavigate();
+
+  const changeEventHandler = (e) => {
+    setInput({ ...input, [e.target.name]: e.target.value });
+  };
+
+  const changeFileHandler = (e) => setInput({ ...input, file: e.target.files?.[0] });
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      if (res.data.success) {
+        navigate("/");
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.error("Login Error:", error.response?.data); // Log detailed error from server
+      const errorMessage = error.response?.data?.message || "An error occurred. Please try again.";
+      toast.error(errorMessage);
+    }
+  };
+  
+
+  return (
+    <div>
+      <Navbar />
+      <div className="flex items-center justify-center max-w-7xl mx-auto">
+        <form onSubmit={submitHandler} className="w-1/2 border-gray-200 rounded-md p-4 my-10">
+          <h1 className="font-bold text-xl mb-2">Login</h1>
+          <div className="my-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="text"
+              placeholder="abc@gmail.com"
+              value={input.email}
+              name="email"
+              onChange={changeEventHandler}
+            />
+          </div>
+
+          <div className="my-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Password"
+              value={input.password}
+              name="password"
+              onChange={changeEventHandler}
+            />
+          </div>
+
+          <div className="flex items-center justify-between my-4">
+            <RadioGroup defaultValue="student" className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="student"
+                  name="role"
+                  value="student"
+                  checked={input.role === "student"}
+                  onChange={changeEventHandler}
+                  className="cursor-pointer"
+                />
+                <Label htmlFor="student">Student</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="recruiter"
+                  name="role"
+                  value="Recruiter"
+                  checked={input.role === "Recruiter"}
+                  onChange={changeEventHandler}
+                  className="cursor-pointer"
+                />
+                <Label htmlFor="recruiter">Recruiter</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <Button type="submit" className="w-full my-4">
+            Login
+          </Button>
+          <span>
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-blue-600">
+              Signup
+            </Link>
+          </span>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
