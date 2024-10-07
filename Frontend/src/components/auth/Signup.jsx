@@ -8,19 +8,25 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { toast } from "sonner";
+import store from "@/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoading } from "@/redux/authSlice";
+import { Loader2 } from "lucide-react"; // Ensure this icon is correctly imported or adjust based on your icon library
 
 const Signup = () => {
   // Initialize state
   const [input, setInput] = useState({
     fullname: "",
     email: "",
-    phoneNumber: "", // Correct case for "phoneNumber"
+    phoneNumber: "",
     password: "",
-    role: "student", // Set default role to "student" if you want it selected initially
-    file: "",
+    role: "student",
+    file: null,
   });
 
+  const { loading } = useSelector((store) => store.auth);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   // Handle text input changes
   const changeEventHandler = (e) => {
@@ -33,12 +39,13 @@ const Signup = () => {
   // Handle form submission
   const submitHandler = async (e) => {
     e.preventDefault();
+    dispatch(setLoading(true));
 
     // Create a new FormData object to handle file uploads and other form fields
     const formData = new FormData();
     formData.append("fullName", input.fullname);
     formData.append("email", input.email);
-    formData.append("phoneNumber", input.phoneNumber); // Corrected field name
+    formData.append("phoneNumber", input.phoneNumber);
     formData.append("password", input.password);
     formData.append("role", input.role);
 
@@ -66,6 +73,8 @@ const Signup = () => {
       console.error("Signup Error:", error.response?.data);
       const errorMessage = error.response?.data?.message || "Registration failed. Please try again.";
       toast.error(errorMessage); // Use toast.error for error messages
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
@@ -95,7 +104,7 @@ const Signup = () => {
             <Input
               id="email"
               name="email"
-              type="text"
+              type="email" // Corrected type to "email"
               placeholder="abc@gmail.com"
               value={input.email}
               onChange={changeEventHandler}
@@ -108,7 +117,7 @@ const Signup = () => {
             <Input
               id="phoneNumber"
               name="phoneNumber"
-              type="number"
+              type="tel" // Corrected type to "tel" for phone numbers
               placeholder="Phone number"
               value={input.phoneNumber}
               onChange={changeEventHandler}
@@ -153,13 +162,13 @@ const Signup = () => {
                   onChange={changeEventHandler}
                   className="cursor-pointer"
                 />
-                <Label htmlFor="employer">employer</Label>
+                <Label htmlFor="employer">Employer</Label> {/* Capitalized "Employer" */}
               </div>
             </RadioGroup>
 
             {/* File Upload Field */}
             <div className="flex items-center gap-2">
-              <Label htmlFor="file"></Label>
+              <Label htmlFor="file">Upload File</Label> {/* Added label text */}
               <input
                 id="file"
                 accept="image/*"
@@ -171,9 +180,16 @@ const Signup = () => {
           </div>
 
           {/* Submit Button */}
-          <Button type="submit" className="w-full my-4">
-            Signup
-          </Button>
+          {loading ? (
+            <Button className="w-full my-4" disabled>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Please wait...
+            </Button>
+          ) : (
+            <Button type="submit" className="w-full my-4">
+              Signup
+            </Button>
+          )}
 
           {/* Login Link */}
           <span>
