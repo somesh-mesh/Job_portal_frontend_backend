@@ -8,11 +8,11 @@ import {
 import {LogOut, User2 } from "lucide-react";
 import { Link,useNavigate } from 'react-router-dom'
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-
-  const user = false;
+  const {user} = useSelector(store=>store.auth);
 
   return (
     <div className="bg-white px-4">

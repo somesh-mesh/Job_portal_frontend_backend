@@ -6,6 +6,7 @@ import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
 import Home from "./components/home"; // Use uppercase `Home` for component names
 import Jobs from "./components/Jobs";
+import Browse from "./components/Browse";
 
 // Define the router
 const appRouter = createBrowserRouter([
@@ -28,6 +29,10 @@ const appRouter = createBrowserRouter([
   {
     path: "/home",
     element: <Home/>,
+  },
+  {
+    path: "/browse",
+    element: <Browse/>,
   },
 ]);
 
