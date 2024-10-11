@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom"; // Corre
 import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
 import Home from "./components/home"; // Use uppercase `Home` for component names
+import Jobs from "./components/Jobs";
 
 // Define the router
 const appRouter = createBrowserRouter([
@@ -19,6 +20,14 @@ const appRouter = createBrowserRouter([
   {
     path: "/signup",
     element: <Signup />,
+  },
+  {
+    path: "/jobs",
+    element: <Jobs/>,
+  },
+  {
+    path: "/home",
+    element: <Home/>,
   },
 ]);
 

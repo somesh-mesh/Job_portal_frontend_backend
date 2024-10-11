@@ -6,7 +6,7 @@ import {
   PopoverContent,
 } from "@radix-ui/react-popover";
 import {LogOut, User2 } from "lucide-react";
-import { Link, useNavigate } from 'react-router-dom'
+import { Link,useNavigate } from 'react-router-dom'
 import React, { useState } from "react";
 
 const Navbar = () => {
@@ -24,9 +24,9 @@ const Navbar = () => {
         </div>
         <div className="flex items-center gap-4">
           <ul className="flex font-medium items-center gap-5">
-            <li>Home</li>
-            <li>Jobs</li>
-            <li>Browse</li>
+            <li><Link to="/home">Home</Link></li>
+            <li><Link to="/jobs">Jobs</Link></li>
+            <li><Link to="/browse">Browse</Link></li>
           </ul>
           <div
             className="ml-4"
