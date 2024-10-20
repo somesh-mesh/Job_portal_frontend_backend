@@ -1,10 +1,13 @@
 import React from 'react';
 import { Button } from './ui/button';
-import {Bookmark } from 'lucide-react';
+import { Bookmark } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import { Badge } from './ui/badge';
+import { useNavigate } from 'react-router-dom';
 
 const Job = () => {
+    const navigate = useNavigate();
+    const jobId = "dfkdflddlfdldlfdflldfldf"
     return (
         <div className='p-5 rounded-md shadow-xl bg-white border border-gray-200'>
             <div className="flex items-center justify-between">
@@ -37,7 +40,7 @@ const Job = () => {
                 <h1 className='font-bold text-lg my-2'>Title</h1>
                 <p className='text-sm text-gray-600'>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos mollitia iusto deserunt dolores ducimus placeat, ad sit praesentium, veritatis rerum delectus possimus architecto doloribus magni nihil quia vero maxime odit?</p>
             </div>
-            
+
             <div className='flex items-center gap-2 mt-4'>
                 {/* Badges with better styling */}
                 <Badge className='bg-blue-100 text-blue-700 font-bold px-2 py-1 rounded-md' variant="ghost">
@@ -51,8 +54,11 @@ const Job = () => {
                 </Badge>
             </div>
             <div className="flex items-center gap-4 mt-4" >
-            <Button variant="outline">Details</Button>
-            <Button className="bg-[#7209b7]">Save For Later</Button>
+                <Button onClick={() =>
+                    navigate(`/description/${jobId}`)
+
+                } variant="outline">Details</Button>
+                <Button className="bg-[#7209b7]">Save For Later</Button>
             </div>
         </div>
     );

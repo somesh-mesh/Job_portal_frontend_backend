@@ -8,6 +8,7 @@ import Home from "./components/home"; // Use uppercase `Home` for component name
 import Jobs from "./components/Jobs";
 import Browse from "./components/Browse";
 import Profile from "./components/Profile";
+import JobDescription from "./components/JobDescription";
 
 
 // Define the router
@@ -26,19 +27,23 @@ const appRouter = createBrowserRouter([
   },
   {
     path: "/jobs",
-    element: <Jobs/>,
+    element: <Jobs />,
   },
   {
     path: "/home",
-    element: <Home/>,
+    element: <Home />,
   },
   {
     path: "/browse",
-    element: <Browse/>,
+    element: <Browse />,
   },
   {
     path: "/profile",
-    element: <Profile/>,
+    element: <Profile />,
+  },
+  {
+    path: "/description/:id",
+    element: <JobDescription />,
   },
 ]);
 
