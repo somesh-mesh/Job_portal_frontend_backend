@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from './shared/Navbar';
 import { AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import { Avatar } from './ui/avatar'; // Assuming this is a wrapper for Radix Avatar or another implementation
@@ -7,12 +7,14 @@ import { Contact, Mail, Pen } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Label } from './ui/label';
 import AppliedJobTable from './AppliedJobTable';
+import UpdateProfileDialog from './UpdateProfileDialog';
 
 const skills = ["html", "css", "js", "ts", "android"]
 
 const Profile = (props) => {
     const isHaveResume = true;
-    return (
+    const [open,setOpen] = useState(false);
+        return (
         <div>
             <Navbar />
             <div className='max-w-4xl mx-auto bg-white border border-gray-200 rounded-2xl my-5 p-8'>
@@ -36,7 +38,7 @@ const Profile = (props) => {
                             </p>
                         </div>
                     </div>
-                    <Button className="text-right" variant="outline">
+                    <Button onClick={()=> setOpen(true)} className="text-right" variant="outline">
                         <Pen className="" />
                     </Button>
                 </div>
@@ -73,6 +75,7 @@ const Profile = (props) => {
 
                 </div>
             </div>
+            <UpdateProfileDialog open={open} setOpen = {setOpen}/>
         </div>
     );
 }
